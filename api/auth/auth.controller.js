@@ -13,7 +13,6 @@ class AuthController {
   async registerUser(req, res, next) {
     try {
       const { email, password } = req.body;
-
       const existingUser = await authModel.findUserByEmail(email);
       if (existingUser) {
         throw new ConflictError("Email in use");
@@ -46,17 +45,46 @@ class AuthController {
         throw new Unauthorized("Password is wrong");
       }
       const token = this.createToken(existingUser._id);
-      await authModel.updateUserById(existingUser, { token });
-      console.log(existingUser);
+
+      await authModel.updateUserById(existingUser._id, { token });
       return res.status(200).json({
-        existingUser,
-        token,
+        user: existingUser,
       });
     } catch (err) {
       next(err);
     }
   }
 
+  async authorize(req, res, next) {
+    try {
+      const authHeader = req.headers.authorization || "";
+      const token = authHeader.replace("Bearer", "");
+      console.log(token);
+      try {
+        await jwt.verify(token, ssjfdskvmdfkeself);
+      } catch (err) {
+        throw new Unauthorized("User is not authorized!");
+      }
+      const user = await authModel.findUserByToken(token);
+      console.log("user", user);
+      if (!user) {
+        throw new Unauthorized("Token is not valid!");
+      }
+      req.user = user;
+      req.token = token;
+      next();
+    } catch (err) {
+      next(err);
+    }
+  }
+  async logOut(req, res, next) {
+    try {
+      await authModel.updateUserById(req.user._id, { token: null });
+      return res.status(204).json();
+    } catch (err) {
+      next(err);
+    }
+  }
   async validateUser(req, res, next) {
     const userRules = Joi.object({
       email: Joi.string().required(),

@@ -19,6 +19,7 @@ userShema.statics.findUsertById = findUsertById;
 userShema.statics.updateUserById = updateUserById;
 userShema.statics.deleteUserById = deleteUserById;
 userShema.statics.findUserByEmail = findUserByEmail;
+userShema.statics.findUserByToken = findUserByToken;
 
 async function createUser(userParams) {
   return this.create(userParams);
@@ -36,7 +37,11 @@ async function updateUserById(id, userParams) {
   if (!ObjectId.isValid(id)) {
     return null;
   }
-  return this.findOneAndUpdate(id, { $set: userParams }, { new: true });
+  return this.findOneAndUpdate(
+    { _id: id },
+    { $set: userParams },
+    { new: true }
+  );
 }
 async function deleteUserById(id) {
   if (!ObjectId.isValid(id)) {
@@ -47,6 +52,10 @@ async function deleteUserById(id) {
 
 async function findUserByEmail(email) {
   return this.findOne({ email });
+}
+
+async function findUserByToken(token) {
+  return this.findOne({ token });
 }
 
 const authModel = mongoose.model("Users", userShema);

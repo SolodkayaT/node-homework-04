@@ -18,3 +18,4 @@ class Unauthorized extends BaseError {
 }
 module.exports = BaseError;
 module.exports = ConflictError;
+module.exports = Unauthorized;

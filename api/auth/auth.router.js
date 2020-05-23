@@ -8,5 +8,8 @@ router.post(
   authController.registerUser
 );
 router.post("/login", authController.validateUser, authController.loginUser);
+
+router.patch("/logout", authController.authorize, authController.logOut);
+
 const authRouter = router;
 module.exports = authRouter;
