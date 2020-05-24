@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 var morgan = require("morgan");
 const mongoose = require("mongoose");
-//const contactRouter = require("./contacts/contact.router");
+const contactRouter = require("./contacts/contact.router");
 const authRouter = require("./auth/auth.router");
 require("dotenv").config();
 
@@ -30,8 +30,7 @@ module.exports = class ContactsServer {
   }
 
   initRoutes() {
-    // this.server.use("/api/contacts", contactRouter);
-    this.server.use("/api/auth", authRouter);
+    this.server.use("/api", authRouter, contactRouter);
   }
   handleErrors() {
     this.server.use((err, req, res, next) => {

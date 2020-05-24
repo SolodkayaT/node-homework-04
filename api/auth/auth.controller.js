@@ -59,7 +59,6 @@ class AuthController {
     try {
       const authHeader = req.headers.authorization || "";
       const token = authHeader.replace("Bearer", "").trim();
-      console.log(token);
       try {
         jwt.verify(token, process.env.JWT_SECRET);
       } catch (err) {
@@ -67,7 +66,6 @@ class AuthController {
       }
 
       const user = await authModel.findUserByToken(token);
-      console.log(user);
       if (!user) {
         throw new Unauthorized("Token is not valid");
       }
@@ -87,6 +85,17 @@ class AuthController {
       next(err);
     }
   }
+
+  async getCurrentUser(req, res, next) {
+    try {
+      return res
+        .status(200)
+        .json({ email: req.user.email, subscription: req.user.subscription });
+    } catch (err) {
+      throw new Unauthorized("Not authorized");
+    }
+  }
+
   async validateUser(req, res, next) {
     const userRules = Joi.object({
       email: Joi.string().required(),

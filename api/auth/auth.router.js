@@ -3,13 +3,22 @@ const router = Router();
 const authController = require("./auth.controller");
 
 router.post(
-  "/register",
+  "/auth/register",
   authController.validateUser,
   authController.registerUser
 );
-router.post("/login", authController.validateUser, authController.loginUser);
+router.post(
+  "/auth/login",
+  authController.validateUser,
+  authController.loginUser
+);
 
-router.patch("/logout", authController.authorize, authController.logOut);
+router.patch("/auth/logout", authController.authorize, authController.logOut);
 
+router.get(
+  "/users/current",
+  authController.authorize,
+  authController.getCurrentUser
+);
 const authRouter = router;
 module.exports = authRouter;
