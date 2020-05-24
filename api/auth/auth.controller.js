@@ -48,27 +48,28 @@ class AuthController {
 
       await authModel.updateUserById(existingUser._id, { token });
       return res.status(200).json({
-        user: existingUser,
+        user: this.composeUserForResponse(existingUser),
+        token,
       });
     } catch (err) {
       next(err);
     }
   }
-
   async authorize(req, res, next) {
     try {
       const authHeader = req.headers.authorization || "";
-      const token = authHeader.replace("Bearer", "");
+      const token = authHeader.replace("Bearer", "").trim();
       console.log(token);
       try {
-        await jwt.verify(token, ssjfdskvmdfkeself);
+        jwt.verify(token, process.env.JWT_SECRET);
       } catch (err) {
-        throw new Unauthorized("User is not authorized!");
+        throw new Unauthorized("User is not authorized");
       }
+
       const user = await authModel.findUserByToken(token);
-      console.log("user", user);
+      console.log(user);
       if (!user) {
-        throw new Unauthorized("Token is not valid!");
+        throw new Unauthorized("Token is not valid");
       }
       req.user = user;
       req.token = token;
@@ -77,6 +78,7 @@ class AuthController {
       next(err);
     }
   }
+
   async logOut(req, res, next) {
     try {
       await authModel.updateUserById(req.user._id, { token: null });
